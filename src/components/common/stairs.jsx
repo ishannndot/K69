@@ -7,24 +7,31 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import { useEffect} from 'react'
 
+gsap.registerPlugin(useGSAP, ScrollTrigger);
+
 const stairs = (props) => {
     
-    useEffect(() => {
+   useEffect(() => {
+  const lenis = new Lenis({
+    duration: 1.4,
+    smoothWheel: true,
+  });
 
-    const lenis = new Lenis({
-      duration: 1.4,
-      smoothWheel: true,
-    });
-    lenis.on("scroll", ScrollTrigger.update);
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+  lenis.on("scroll", ScrollTrigger.update);
 
-    requestAnimationFrame(raf);
+  const update = (time) => {
+    lenis.raf(time * 1000);
+  };
 
-    return () => lenis.destroy();
-  }, []);
+  gsap.ticker.add(update);
+  gsap.ticker.lagSmoothing(0);
+
+  return () => {
+    gsap.ticker.remove(update);
+    lenis.destroy();
+  };
+}, []);
+
     const currentPath = useLocation().pathname
     const stairParentRef = useRef(null)
     const pageRef = useRef(null);
